@@ -1,0 +1,28 @@
+name: opencode
+services:
+  opencode:
+    build: .
+    container_name: opencode
+
+    working_dir: "${WORKDIR:-${PWD?WORKDIR or PWD must be set to code path}}"
+
+    ports:
+      - "4096:4096"
+
+    volumes:
+      - ./data/share:/home/node/.local/share/opencode
+      - ./data/state:/home/node/.local/state/opencode
+      - "${WORKDIR:-${PWD?WORKDIR or PWD must be set to code path}}:${WORKDIR:-${PWD?WORKDIR or PWD must be set to code path}}"
+
+    environment:
+      TZ: ${TZ:-UTC}
+      OPENCODE_DISABLE_AUTOUPDATE: ${OPENCODE_DISABLE_AUTOUPDATE:-1}
+      #OPENCODE_ENABLE_EXA: ${OPENCODE_ENABLE_EXA:-1}
+      OPENCODE_SERVER_USERNAME: ${OPENCODE_SERVER_USERNAME:-}
+      OPENCODE_SERVER_PASSWORD: ${OPENCODE_SERVER_PASSWORD:-}
+      FIRECRAWL_API_URL: http://host-gateway:3002
+
+    restart: unless-stopped
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
