@@ -1,0 +1,4 @@
+[submodule "firecrawl"]
+	path = firecrawl
+	url = https://github.com/h0tw1r3/firecrawl.git
+	branch = h0tw1r3
