@@ -94,7 +94,7 @@ COPY --from=init-suid /init /init
 # healthcheck
 COPY --from=ghcr.io/tarampampam/microcheck:1.3.0 /bin/httpcheck /bin/httpcheck
 HEALTHCHECK --start-period=30s --start-interval=1s --interval=1m --timeout=10s \
-  CMD ["/bin/httpcheck", "http://localhost:3000/global/health"]
+  CMD ["/bin/httpcheck", "http://localhost:4096/global/health"]
 
 USER node
 WORKDIR /must-be-set-at-runtime
