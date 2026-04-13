@@ -52,14 +52,10 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // execv requires an array of arguments starting with the script path
-    // Let's use execvp to be slightly more flexible or execl for directness
     char *script = "/usr/local/bin/entrypoint.sh";
     
-    // We pass argv so that flags passed to the container reach the script
     execv(script, argv);
 
-    // If we reach here, execv failed
     fprintf(stderr, "Wrapper: Failed to execute %s: %s\n", script, strerror(errno));
     return 1;
 }
@@ -106,6 +102,26 @@ cat > /home/node/.config/opencode/config.json <<"EOL"
   },
   "watcher": {
     "ignore": ["node_modules/**", "dist/**", ".git/**", ".venv/**"]
+  },
+  "provider": {
+    "local-llama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Local OpenAI (port 8081)",
+      "options": {
+        "baseURL": "http://host.docker.internal:8081/v1",
+        "toolParser": [
+          { "type": "raw-function-call" },
+          { "type": "json" }
+        ]
+      },
+      "models": {
+        "gemma4-26b": {
+          "name": "Gemma 4 26B",
+          "tool_call": true,
+          "limit": { "context": 32768, "output": 8192 }
+        }
+      }
+    }
   }
 }
 EOL
