@@ -82,49 +82,6 @@ RUN <<EOD
 mkdir -p /home/node/.local/share/opencode
 mkdir -p /home/node/.local/state/opencode
 mkdir -p /home/node/.config/opencode
-
-cat > /home/node/.config/opencode/config.json <<"EOL"
-{
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": [
-    "github:firecrawl/opencode-firecrawl#a5a7939005ad67b0a7a03f495aa224f6e9d2bb20@a5a7939005ad67b0a7a03f495aa224f6e9d2bb20",
-    "micode"
-  ],
-  "permission": {
-    "external_directory": {
-      "${env:WORKDIR}/**": "allow",
-      "/tmp/**": "allow",
-      "/var/tmp/**": "allow"
-    }
-  },
-  "server": {
-    "hostname": "0.0.0.0"
-  },
-  "watcher": {
-    "ignore": ["node_modules/**", "dist/**", ".git/**", ".venv/**"]
-  },
-  "provider": {
-    "local-llama": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Local OpenAI (port 8081)",
-      "options": {
-        "baseURL": "http://host.docker.internal:8081/v1",
-        "toolParser": [
-          { "type": "raw-function-call" },
-          { "type": "json" }
-        ]
-      },
-      "models": {
-        "gemma4-26b": {
-          "name": "Gemma 4 26B Q8_0",
-          "tool_call": true,
-          "limit": { "context": 96000, "output": 8192 }
-        }
-      }
-    }
-  }
-}
-EOL
 EOD
 
 USER root

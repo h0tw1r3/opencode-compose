@@ -1,0 +1,43 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "github:firecrawl/opencode-firecrawl#a5a7939005ad67b0a7a03f495aa224f6e9d2bb20@a5a7939005ad67b0a7a03f495aa224f6e9d2bb20",
+    "micode"
+  ],
+  "permission": {
+    "external_directory": {
+      "${env:WORKDIR}/**": "allow",
+      "/tmp/**": "allow",
+      "/var/tmp/**": "allow"
+    }
+  },
+  "server": {
+    "hostname": "0.0.0.0"
+  },
+  "watcher": {
+    "ignore": ["node_modules/**", "dist/**", ".git/**", ".venv/**"]
+  },
+  "provider": {
+    "litellm": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LiteLLM",
+      "options": {
+        "baseURL": "http://litellm:4000/v1",
+        "apiKey": "${env:LITELLM_MASTER_KEY}"
+      },
+      "models": {
+        "gemma4-26b": {
+          "name": "Gemma 4 26B Q8_0",
+          "tool_call": true,
+          "limit": { "context": 96000, "output": 8192 }
+        },
+        "gpt-4o-mini": {
+          "name": "GPT-4o Mini",
+          "tool_call": true,
+          "limit": { "context": 128000, "output": 8192 }
+        }
+      }
+    }
+  },
+  "model": "litellm/gemma4-26b"
+}

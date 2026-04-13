@@ -1,0 +1,14 @@
+model_list:
+  - model_name: gemma4-26b
+    litellm_params:
+      # OpenAI-compatible local llama server
+      model: openai/gemma4-26b
+      api_base: http://host.docker.internal:8081/v1
+      api_key: os.environ/LITELLM_LOCAL_API_KEY
+
+  - model_name: gpt-4o-mini
+    litellm_params:
+      # Optional remote provider example (OpenAI)
+      model: openai/gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+      additional_drop_params: ["reasoningSummary"]
