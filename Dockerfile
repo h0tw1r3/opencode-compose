@@ -116,9 +116,9 @@ cat > /home/node/.config/opencode/config.json <<"EOL"
       },
       "models": {
         "gemma4-26b": {
-          "name": "Gemma 4 26B",
+          "name": "Gemma 4 26B Q8_0",
           "tool_call": true,
-          "limit": { "context": 32768, "output": 8192 }
+          "limit": { "context": 96000, "output": 8192 }
         }
       }
     }
