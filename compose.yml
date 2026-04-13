@@ -52,7 +52,8 @@ services:
       #OPENCODE_ENABLE_EXA: ${OPENCODE_ENABLE_EXA:-1}
       OPENCODE_SERVER_USERNAME: ${OPENCODE_SERVER_USERNAME:-}
       OPENCODE_SERVER_PASSWORD: ${OPENCODE_SERVER_PASSWORD:-}
-      FIRECRAWL_API_URL: http://host-gateway:3002
+      FIRECRAWL_API_URL: http://host.docker.internal:3002
+      FIRECRAWL_API_KEY: ${FIRECRAWL_API_KEY:-local}
 
     restart: unless-stopped
 
