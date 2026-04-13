@@ -1,4 +1,4 @@
-FROM node:24.13.1-bookworm
+FROM node:24.13.1-trixie
 
 FROM scratch AS node
 COPY --from=0 / /
@@ -34,16 +34,39 @@ export PATH="$HOME/.local/bin:$PATH"
 EOF
 EOD
 
-FROM node AS init-suid
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-ENV DEBIAN_FRONTEND=noninteractive
+FROM alpine:latest AS init_builder
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    --mount=type=bind,source=entrypoint.sh,target=/entrypoint.sh \
-    apt-get update -qy ; \
-    apt-get -qy install shc build-essential ; \
-    shc -S -r -f /entrypoint.sh -o /init ; \
-    chmod 755 /init && chmod ug+s /init
+# Install only the essential compiler tools
+RUN apk add --no-cache build-base
+
+WORKDIR /
+COPY <<EOF ./wrapper.c
+#include <unistd.h>
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+
+int main(int argc, char *argv[]) {
+    if (setuid(0) != 0) {
+        fprintf(stderr, "Wrapper: Failed to setuid: %s\n", strerror(errno));
+        return 1;
+    }
+
+    // execv requires an array of arguments starting with the script path
+    // Let's use execvp to be slightly more flexible or execl for directness
+    char *script = "/usr/local/bin/entrypoint.sh";
+    
+    // We pass argv so that flags passed to the container reach the script
+    execv(script, argv);
+
+    // If we reach here, execv failed
+    fprintf(stderr, "Wrapper: Failed to execute %s: %s\n", script, strerror(errno));
+    return 1;
+}
+EOF
+
+# Compile with static linking to avoid library mismatches
+RUN gcc -static wrapper.c -o init && chmod 755 init && chmod ug+s init
 
 FROM node AS final
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
@@ -89,7 +112,8 @@ EOL
 EOD
 
 USER root
-COPY --from=init-suid /init /init
+COPY --from=init_builder /init /init
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # healthcheck
 COPY --from=ghcr.io/tarampampam/microcheck:1.3.0 /bin/httpcheck /bin/httpcheck
